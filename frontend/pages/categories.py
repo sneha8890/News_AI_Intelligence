@@ -10,55 +10,39 @@ st.title("📰 Choose News Category")
 
 st.write("Select a category to explore latest news")
 
-# ==========================================
-# CATEGORY DATA
-# ==========================================
-
 categories = [
-
     {
         "title": "World News",
         "text": "Latest updates from around the globe.",
         "image": "🌍"
     },
-
     {
         "title": "Technology",
         "text": "AI, gadgets, and tech trends.",
         "image": "💻"
     },
-
     {
         "title": "Finance",
         "text": "Markets, economy, and business news.",
         "image": "💰"
     },
-
     {
         "title": "Sports",
         "text": "Scores, highlights, and sports news.",
         "image": "🏅"
     },
-
     {
         "title": "Entertainment",
         "text": "Movies, TV, and celebrity news.",
         "image": "🎬"
     }
-
 ]
 
-# ==========================================
-# GRID LAYOUT
-# ==========================================
+col1 = st.columns(1)[0]
 
-col1 = st.columns(1)
+for category in categories:
 
-for index, category in enumerate(categories):
-
-    current_col = col1
-
-    with current_col:
+    with col1:
 
         clicked = card(
             title=category["title"],
@@ -67,19 +51,17 @@ for index, category in enumerate(categories):
             styles={
                 "card": {
                     "width": "100%",
-                    "height": "50px",
+                    "height": "150px",
                     "border-radius": "20px",
                     "box-shadow": "0 4px 20px rgba(0,0,0,0.2)",
                     "background-color": "#1e293b",
                     "padding": "10px",
                 },
-
                 "title": {
                     "font-size": "14px",
                     "font-weight": "bold",
                     "color": "#38bdf8",
                 },
-
                 "text": {
                     "font-size": "10px",
                     "color": "#cbd5e1",
@@ -87,12 +69,6 @@ for index, category in enumerate(categories):
             }
         )
 
-        # ==========================================
-        # NAVIGATION
-        # ==========================================
-
         if clicked:
-
             st.session_state["selected_category"] = category
-
             st.switch_page("pages/news.py")

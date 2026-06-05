@@ -4,54 +4,40 @@ st.set_page_config(layout="wide")
 st.title("News Articles")
 st.write("Displaying articles for category: ", st.session_state.get("icon_category", "🌍"), st.session_state.get("selected_category", "World"))
 
-news_data = [
+import requests
 
-    {
-        "title": "OpenAI launches new AI model",
-        "summary": [
-            "Model improves reasoning",
-            "Faster response generation",
-            "Enterprise adoption rising"
-        ],
-        "url": "https://openai.com/blog/new-model"
-    },
+selected_category = st.session_state["selected_category"]["title"]
 
-    {
-        "title": "NVIDIA stock surges",
-        "summary": [
-            "AI demand increasing",
-            "Revenue exceeds estimates",
-            "Market optimism rises"
-        ],
-        "url": "https://www.nvidia.com/en-us/"
-    },
-
-    {
-        "title": "IPL finals announced",
-        "summary": [
-            "Teams finalized",
-            "Massive fan excitement",
-            "Record ticket sales"
-        ],
-        "url": "https://www.iplt20.com/"
+response = requests.get(
+    "http://127.0.0.1:8000/news",
+    params={
+        "category": selected_category
     }
+)
 
-]
+data = response.json()
 
-for news in news_data:
+articles = data["articles"]
+
+for article in articles:
 
     with st.container(border=True):
 
-        st.subheader(news["title"])
+        st.subheader(article["title"])
 
-        for point in news["summary"]:
-            st.write(f"• {point}")
+        st.write(article.get("description", ""))
 
         if st.button(
             "Read More",
-            key=news["title"]
+            key=article["title"]
         ):
 
-            st.session_state["selected_news"] = news
+            st.session_state["selected_news"] = {
+                "title": article["title"],
+                "summary": [
+                    article.get("description", "")
+                ],
+                "url": article["url"]
+            }
 
             st.switch_page("pages/detail.py")
