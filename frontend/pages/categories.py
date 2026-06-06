@@ -1,74 +1,61 @@
 import streamlit as st
-from streamlit_card import card
 
-st.set_page_config(
-    page_title="Categories",
-    layout="wide"
-)
+st.set_page_config(layout="wide")
 
-st.title("📰 Choose News Category")
-
-st.write("Select a category to explore latest news")
+st.title("📰 Choose Category")
 
 categories = [
     {
-        "title": "World News",
-        "text": "Latest updates from around the globe.",
-        "image": "🌍"
+        "title":"World News",
+        "icon":"🌍",
+        "desc":"Latest global news"
     },
     {
-        "title": "Technology",
-        "text": "AI, gadgets, and tech trends.",
-        "image": "💻"
+        "title":"Technology",
+        "icon":"💻",
+        "desc":"AI, Gadgets and Startups"
     },
     {
-        "title": "Finance",
-        "text": "Markets, economy, and business news.",
-        "image": "💰"
+        "title":"Finance",
+        "icon":"💰",
+        "desc":"Markets and Economy"
     },
     {
-        "title": "Sports",
-        "text": "Scores, highlights, and sports news.",
-        "image": "🏅"
+        "title":"Sports",
+        "icon":"🏏",
+        "desc":"Cricket and Sports"
     },
     {
-        "title": "Entertainment",
-        "text": "Movies, TV, and celebrity news.",
-        "image": "🎬"
+        "title":"Entertainment",
+        "icon":"🎬",
+        "desc":"Movies and Celebrities"
     }
 ]
 
-col1 = st.columns(1)[0]
+col1,col2 = st.columns(2)
 
-for category in categories:
+for idx,category in enumerate(categories):
 
-    with col1:
+    current_col = col1 if idx % 2 == 0 else col2
 
-        clicked = card(
-            title=category["title"],
-            text=category["text"],
-            image=category["image"],
-            styles={
-                "card": {
-                    "width": "100%",
-                    "height": "150px",
-                    "border-radius": "20px",
-                    "box-shadow": "0 4px 20px rgba(0,0,0,0.2)",
-                    "background-color": "#1e293b",
-                    "padding": "10px",
-                },
-                "title": {
-                    "font-size": "14px",
-                    "font-weight": "bold",
-                    "color": "#38bdf8",
-                },
-                "text": {
-                    "font-size": "10px",
-                    "color": "#cbd5e1",
-                }
-            }
-        )
+    with current_col:
 
-        if clicked:
-            st.session_state["selected_category"] = category
-            st.switch_page("pages/news.py")
+        with st.container(border=True):
+
+            st.markdown(
+                f"""
+                ## {category['icon']} {category['title']}
+
+                {category['desc']}
+                """
+            )
+
+            if st.button(
+                f"Open {category['title']}",
+                key=category["title"],
+                use_container_width=True
+            ):
+
+                st.session_state["selected_category"] = category
+
+                st.switch_page("pages/news.py")

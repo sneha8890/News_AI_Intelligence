@@ -1,14 +1,18 @@
+# ...existing code...
 import os
 import requests
 from dotenv import load_dotenv
 
 load_dotenv()
 
-API_KEY = os.getenv("NEWS_API_KEY")
+# Match the name used in your .env; change to "NEWS_API_KEY" if you rename the variable there
+API_KEY = os.getenv("API_KEY")
 
 
 def get_news(category):
-    
+    if not API_KEY:
+        raise RuntimeError("API key not set. Add API_KEY to your .env or change this code to read NEWS_API_KEY.")
+
     category_mapping = {
         "Technology": "technology",
         "Finance": "business",
@@ -19,14 +23,14 @@ def get_news(category):
 
     api_category = category_mapping.get(category, "general")
 
-    url = (
-        f"https://newsapi.org/v2/top-headlines?"
-        f"category={api_category}"
-        f"&language=en"
-        f"&pageSize=5"
-        f"&apiKey={API_KEY}"
-    )
+    url = "https://newsapi.org/v2/top-headlines"
+    params = {"category": api_category, "pageSize": 10, "apiKey": API_KEY}
 
-    response = requests.get(url)
-
-    return response.json()
+    try:
+        resp = requests.get(url, params=params, timeout=10)
+        resp.raise_for_status()
+        data = resp.json()
+        return data.get("articles", [])
+    except requests.exceptions.RequestException as e:
+        print(f"Failed to fetch news for {category}: {e}")
+        return []

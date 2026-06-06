@@ -1,32 +1,95 @@
 import streamlit as st
+import requests
 
 st.set_page_config(layout="wide")
 
-news = st.session_state.get("selected_news")
+article = st.session_state.get(
+    "selected_news"
+)
 
-if not news:
+if not article:
 
-    st.warning("No news selected")
+    st.warning(
+        "No article selected"
+    )
 
     st.stop()
 
-st.title(news["title"])
-
-st.write("## Full Story")
-
-st.write(
-    '''
-    This is where the complete article
-    summary will come later using AI.
-    '''
+st.title(
+    article.get("title")
 )
 
-st.write("## Key Highlights")
+if article.get("urlToImage"):
 
-for point in news["summary"]:
-    st.write(f"• {point}")
+    st.image(
+        article["urlToImage"],
+        use_container_width=True
+    )
+
+source = (
+    article
+    .get("source", {})
+    .get("name", "Unknown")
+)
+
+st.caption(
+    f"Source: {source}"
+)
+
+st.divider()
+
+description = article.get(
+    "description",
+    ""
+)
+
+if description:
+
+    with st.spinner(
+        "Generating AI summary..."
+    ):
+
+        try:
+
+            response = requests.post(
+                "http://localhost:8000/summarize",
+                json={
+                    "article": description
+                }
+            )
+
+            summary = (
+                response.json()
+                .get("summary")
+            )
+
+            st.subheader(
+                "🤖 AI Summary"
+            )
+
+            st.markdown(summary)
+
+        except Exception:
+
+            st.warning(
+                "Summary unavailable"
+            )
+
+st.divider()
+
+st.subheader("Article")
+
+st.write(
+    article.get(
+        "content",
+        article.get(
+            "description",
+            ""
+        )
+    )
+)
 
 st.link_button(
     "Read Original Article",
-    news["url"]
+    article["url"]
 )
