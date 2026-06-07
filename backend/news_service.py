@@ -1,36 +1,107 @@
-# ...existing code...
 import os
 import requests
+
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# Match the name used in your .env; change to "NEWS_API_KEY" if you rename the variable there
-API_KEY = os.getenv("API_KEY")
+API_KEY = os.getenv("NEWS_API_KEY")
 
 
 def get_news(category):
-    if not API_KEY:
-        raise RuntimeError("API key not set. Add API_KEY to your .env or change this code to read NEWS_API_KEY.")
 
     category_mapping = {
         "Technology": "technology",
         "Finance": "business",
         "Sports": "sports",
-        "Entertainment": "entertainment",
-        "World News": "general"
+        "Entertainment": "entertainment"
     }
 
-    api_category = category_mapping.get(category, "general")
+    if category == "World News":
 
-    url = "https://newsapi.org/v2/top-headlines"
-    params = {"category": api_category, "pageSize": 10, "apiKey": API_KEY}
+        response = requests.get(
+            "https://newsapi.org/v2/everything",
+            params={
+                "q": "world",
+                "language": "en",
+                "sortBy": "publishedAt",
+                "pageSize": 100,
+                "apiKey": API_KEY
+            }
+        )
 
-    try:
-        resp = requests.get(url, params=params, timeout=10)
-        resp.raise_for_status()
-        data = resp.json()
-        return data.get("articles", [])
-    except requests.exceptions.RequestException as e:
-        print(f"Failed to fetch news for {category}: {e}")
-        return []
+    else:
+
+        response = requests.get(
+            "https://newsapi.org/v2/top-headlines",
+            params={
+                "category": category_mapping.get(
+                    category,
+                    "general"
+                ),
+                "country": "us",
+                "pageSize": 100,
+                "apiKey": API_KEY
+            }
+        )
+
+    data = response.json()
+
+    articles = data.get(
+        "articles",
+        []
+    )
+
+    unique_articles = []
+
+    seen_titles = set()
+
+    seen_sources = set()
+
+    for article in articles:
+
+        title = article.get(
+            "title",
+            ""
+        )
+
+        source = (
+            article
+            .get("source", {})
+            .get("name", "")
+        )
+
+        if not title:
+            continue
+
+        normalized_title = (
+            title
+            .lower()
+            .strip()
+        )
+
+        if normalized_title in seen_titles:
+            continue
+
+        # Prefer different sources
+        if source in seen_sources and len(unique_articles) >= 10:
+            continue
+
+        seen_titles.add(
+            normalized_title
+        )
+
+        seen_sources.add(
+            source
+        )
+
+        unique_articles.append(
+            article
+        )
+
+        if len(unique_articles) == 10:
+            break
+
+    data["articles"] = unique_articles
+
+    return data

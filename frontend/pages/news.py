@@ -8,7 +8,11 @@ selected_category = st.session_state.get(
 )
 
 if not selected_category:
-    st.warning("Please select category")
+
+    st.warning(
+        "Please select category"
+    )
+
     st.stop()
 
 st.title(
@@ -24,12 +28,7 @@ try:
         }
     )
 
-    st.write("Response Status:", response.status_code)
-
     data = response.json()
-
-    st.write("Raw Response")
-    st.json(data)
 
     articles = data.get(
         "articles",
@@ -38,19 +37,19 @@ try:
 
 except Exception as e:
 
-    st.error(f"Backend Error : {e}")
+    st.error(
+        f"Backend Error: {e}"
+    )
+
     st.stop()
+
+st.subheader(
+    f"{len(articles)} Latest Articles"
+)
 
 for article in articles:
 
     with st.container(border=True):
-
-        st.subheader(
-            article.get(
-                "title",
-                "No Title"
-            )
-        )
 
         if article.get("urlToImage"):
 
@@ -59,20 +58,32 @@ for article in articles:
                 use_container_width=True
             )
 
+        st.subheader(
+            article.get(
+                "title",
+                "No Title"
+            )
+        )
+
         source = (
             article
             .get("source", {})
             .get("name", "Unknown")
         )
 
+        published = article.get(
+            "publishedAt",
+            ""
+        )[:10]
+
         st.caption(
-            f"Source: {source}"
+            f"{source} • {published}"
         )
 
         st.write(
             article.get(
                 "description",
-                "No description"
+                ""
             )
         )
 

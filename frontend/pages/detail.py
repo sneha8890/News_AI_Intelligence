@@ -1,5 +1,5 @@
-import streamlit as st
 import requests
+import streamlit as st
 
 st.set_page_config(layout="wide")
 
@@ -16,7 +16,10 @@ if not article:
     st.stop()
 
 st.title(
-    article.get("title")
+    article.get(
+        "title",
+        ""
+    )
 )
 
 if article.get("urlToImage"):
@@ -32,64 +35,71 @@ source = (
     .get("name", "Unknown")
 )
 
-st.caption(
-    f"Source: {source}"
-)
-
-st.divider()
-
-description = article.get(
-    "description",
+published = article.get(
+    "publishedAt",
     ""
+)[:10]
+
+st.caption(
+    f"{source} • {published}"
 )
-
-if description:
-
-    with st.spinner(
-        "Generating AI summary..."
-    ):
-
-        try:
-
-            response = requests.post(
-                "http://localhost:8000/summarize",
-                json={
-                    "article": description
-                }
-            )
-
-            summary = (
-                response.json()
-                .get("summary")
-            )
-
-            st.subheader(
-                "🤖 AI Summary"
-            )
-
-            st.markdown(summary)
-
-        except Exception:
-
-            st.warning(
-                "Summary unavailable"
-            )
 
 st.divider()
 
-st.subheader("Article")
+with st.spinner(
+    "Generating AI Summary..."
+):
 
-st.write(
-    article.get(
-        "content",
-        article.get(
-            "description",
-            ""
+    try:
+
+        response = requests.post(
+            "http://localhost:8000/summarize",
+            json={
+                "title": article.get(
+                    "title",
+                    ""
+                ),
+                "description": article.get(
+                    "description",
+                    ""
+                ),
+                "content": article.get(
+                    "content",
+                    ""
+                ),
+                "url": article.get(
+                    "url",
+                    ""
+                )
+            }
         )
-    )
-)
+
+        summary = (
+            response.json()
+            .get(
+                "summary",
+                ""
+            )
+        )
+
+        st.subheader(
+            "🤖 AI Summary"
+        )
+
+        st.markdown(
+            summary
+        )
+
+    except Exception:
+
+        st.warning(
+            "Summary unavailable"
+        )
+
+st.divider()
 
 st.link_button(
     "Read Original Article",
     article["url"]
 )
+

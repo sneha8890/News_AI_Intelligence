@@ -2,13 +2,16 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 from news_service import get_news
-from ollama_service import summarize_news
+from ollama_services import summarize_news
 
 app = FastAPI()
 
 
 class SummaryRequest(BaseModel):
-    article: str
+    title: str = ""
+    description: str = ""
+    content: str = ""
+    url: str = ""
 
 
 @app.get("/news")
@@ -21,7 +24,12 @@ def news(category: str):
 def summarize(request: SummaryRequest):
 
     summary = summarize_news(
-        request.article
+        {
+            "title": request.title,
+            "description": request.description,
+            "content": request.content,
+            "url": request.url
+        }
     )
 
     return {
