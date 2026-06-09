@@ -6,9 +6,9 @@ st.title("📰 Choose Category")
 
 categories = [
     {
-        "title":"World News",
+        "title":"Top Headlines",
         "icon":"🌍",
-        "desc":"Latest global news"
+        "desc":"Latest today's news"
     },
     {
         "title":"Technology",
@@ -59,3 +59,13 @@ for idx,category in enumerate(categories):
                 st.session_state["selected_category"] = category
 
                 st.switch_page("pages/news.py")
+
+            if st.button(
+                f"Analyse",
+                key=f"a_{category['title']}",
+                use_container_width=True
+            ):
+
+                st.session_state["selected_category"] = category
+
+                st.switch_page("pages/analyse.py")

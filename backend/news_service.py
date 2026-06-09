@@ -17,14 +17,18 @@ def get_news(category):
         "Entertainment": "entertainment"
     }
 
-    if category == "World News":
+    if category == "Top Headlines":
+
+        sources = (
+            "bbc-news",
+            "reuters",
+            "associated-press"
+        )
 
         response = requests.get(
-            "https://newsapi.org/v2/everything",
+            "https://newsapi.org/v2/top-headlines",
             params={
-                "q": "world",
-                "language": "en",
-                "sortBy": "publishedAt",
+                "sources": sources,
                 "pageSize": 100,
                 "apiKey": API_KEY
             }
@@ -39,24 +43,22 @@ def get_news(category):
                     category,
                     "general"
                 ),
-                "country": "us",
                 "pageSize": 100,
                 "apiKey": API_KEY
             }
         )
 
     data = response.json()
-
+    print(data)
     articles = data.get(
         "articles",
         []
     )
 
+
     unique_articles = []
 
     seen_titles = set()
-
-    seen_sources = set()
 
     for article in articles:
 
@@ -65,34 +67,19 @@ def get_news(category):
             ""
         )
 
-        source = (
-            article
-            .get("source", {})
-            .get("name", "")
-        )
-
         if not title:
             continue
 
-        normalized_title = (
-            title
-            .lower()
-            .strip()
+        normalized_title = " ".join(
+            title.lower().split()[:8]
         )
 
         if normalized_title in seen_titles:
             continue
 
-        # Prefer different sources
-        if source in seen_sources and len(unique_articles) >= 10:
-            continue
 
         seen_titles.add(
             normalized_title
-        )
-
-        seen_sources.add(
-            source
         )
 
         unique_articles.append(
