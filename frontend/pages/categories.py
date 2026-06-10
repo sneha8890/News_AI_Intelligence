@@ -69,3 +69,17 @@ for idx,category in enumerate(categories):
                 st.session_state["selected_category"] = category
 
                 st.switch_page("pages/analyse.py")
+
+            if st.button(
+                f"Ask AI - {category['title']}",
+                key=f"chat_{category['title']}",
+                use_container_width=True
+            ):
+
+                st.session_state[
+                    "selected_category"
+                ] = category
+
+                st.switch_page(
+                    "pages/chat.py"
+                )

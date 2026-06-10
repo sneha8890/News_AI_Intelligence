@@ -263,3 +263,66 @@ def analyse_news(
             "entities": [],
             "updates": []
         }
+    
+
+def ask_news_ai(
+    question,
+    articles
+):
+
+    news_context = ""
+
+    for article in articles:
+
+        news_context += f"""
+        Title:
+        {article.get('title', '')}
+
+        Description:
+        {article.get('description', '')}
+
+        Source:
+        {article.get('source', {}).get('name', '')}
+
+        ----------------------
+        """
+
+    prompt = f"""
+    You are a News Intelligence Assistant.
+
+    You must answer ONLY using the news
+    articles provided below.
+
+    Rules:
+
+    1. Answer only from the supplied news.
+    2. Do not use external knowledge.
+    3. If enough information is unavailable,
+       return ONLY:
+
+       NOT_FOUND
+    4. Do not make information up.
+    5. Be concise and to the point.
+
+    Question:
+
+    {question}
+
+    News Articles:
+
+    {news_context}
+    """
+
+    response = ollama.chat(
+        model="qwen3:8b",
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
+    )
+
+    return (
+        response["message"]["content"]
+    )

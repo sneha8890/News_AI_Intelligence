@@ -81,31 +81,34 @@ with st.spinner(
         data = response.json()
         print(type(data))
 
-        st.subheader(
-            "Trends"
-        )
+        col1,col2= st.columns(2)
 
-        for point in data.get(
-            "trends",
-            []
-        ):
-            st.markdown(
-                f"• {point}"
+        with col1:
+            st.subheader(
+                "Trends"
             )
 
-        st.subheader(
-            "Entities"
-        )
-
-        for point in data.get(
-            "entities",
-            []
-        ):
-            st.markdown(
-                f"• {point}"
-            )
-
+            for point in data.get(
+                "trends",
+                []
+            ):
+                st.markdown(
+                    f"• {point}"
+                )
         
+        with col2:
+            st.subheader(
+                "Entities"
+            )
+
+            for point in data.get(
+                "entities",
+                []
+            ):
+                st.markdown(
+                    f"• {point}"
+                )
+
         st.subheader(
             "Most Important Updates"
         )
