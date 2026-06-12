@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-
+from typing import Optional
 from news_service import get_news
 from ollama_services import (
     summarize_news,
@@ -23,8 +23,12 @@ class SummaryRequest(BaseModel):
     url: str = ""
 
 class AskRequest(BaseModel):
+
     question: str
+
     articles: list
+
+    messages: Optional[list] = []
 
 
 @app.get("/news")
@@ -65,7 +69,8 @@ def ask(
 
     answer = ask_news_ai(
         request.question,
-        request.articles
+        request.articles,
+        request.messages
     )
 
     return {

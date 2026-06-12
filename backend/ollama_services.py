@@ -267,50 +267,63 @@ def analyse_news(
 
 def ask_news_ai(
     question,
-    articles
+    articles,
+    messages
 ):
 
     news_context = ""
+
+    conversation_context = ""
+
+    for message in messages[-10:]:
+
+        conversation_context += f"""
+        {message["role"].upper()}:
+        {message["content"]}
+        """
 
     for article in articles:
 
         news_context += f"""
         Title:
-        {article.get('title', '')}
+        {article.get("title", "")}
 
         Description:
-        {article.get('description', '')}
+        {article.get("description", "")}
 
         Source:
-        {article.get('source', {}).get('name', '')}
+        {article.get("source", {}).get("name", "")}
 
-        ----------------------
+        ---------------------
         """
 
     prompt = f"""
-    You are a News Intelligence Assistant.
+You are a News Intelligence Assistant.
 
-    You must answer ONLY using the news
-    articles provided below.
+    Use ONLY the news articles below.
 
-    Rules:
+    Conversation History:
 
-    1. Answer only from the supplied news.
-    2. Do not use external knowledge.
-    3. If enough information is unavailable,
-       return ONLY:
+    {conversation_context}
 
-       NOT_FOUND
-    4. Do not make information up.
-    5. Be concise and to the point.
-
-    Question:
+    Current Question:
 
     {question}
 
     News Articles:
 
     {news_context}
+
+    Rules:
+
+    1. Use conversation history when needed.
+    2. Use ONLY provided news.
+    3. Do not use external knowledge.
+    4. If answer not available return ONLY:
+
+    NOT_FOUND
+
+    5. Keep answers concise.
     """
 
     response = ollama.chat(
