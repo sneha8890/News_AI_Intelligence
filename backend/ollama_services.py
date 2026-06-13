@@ -2,6 +2,7 @@ import requests
 import trafilatura
 import ollama
 import json
+from tavily_service import search_web
 
 def get_article_text(url):
 
@@ -320,10 +321,44 @@ You are a News Intelligence Assistant.
     2. Use ONLY provided news.
     3. Do not use external knowledge.
     4. If answer not available return ONLY:
-
     NOT_FOUND
-
     5. Keep answers concise.
+    """
+
+    response = ollama.chat(
+        model="qwen3:8b",
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
+    )
+
+    return (
+        response["message"]["content"]
+    )
+
+
+def ask_tavily(
+    question
+):
+
+    web_context = search_web(
+        question
+    )
+
+    prompt = f"""
+    Answer the question using
+    the web search results.
+
+    Question:
+
+    {question}
+
+    Search Results:
+
+    {web_context}
     """
 
     response = ollama.chat(

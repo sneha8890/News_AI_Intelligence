@@ -5,7 +5,12 @@ from news_service import get_news
 from ollama_services import (
     summarize_news,
     analyse_news,
-    ask_news_ai
+    ask_news_ai,
+    ask_tavily
+)
+
+from langgraph_service import (
+    run_agent
 )
 
 app = FastAPI()
@@ -67,7 +72,7 @@ def ask(
     request: AskRequest
 ):
 
-    answer = ask_news_ai(
+    answer = run_agent(
         request.question,
         request.articles,
         request.messages

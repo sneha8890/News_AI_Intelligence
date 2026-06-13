@@ -15,7 +15,7 @@ def search_web(
 
     response = client.search(
         query=query,
-        max_results=5
+        max_results=2
     )
 
     context = ""
